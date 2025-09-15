@@ -1,0 +1,105 @@
+---
+title: "Rationale"
+output: html_document
+date: "2025-09-14"
+---
+
+## Rationale 
+
+For the model $y_{ijk} = \mu + V_s + \alpha_i + \beta_{(si)j} + T_k + (VT)_{sk} + \varepsilon_{sijk}$, where: 
+
+$y_{ijk}$ = Species Composition
+$\mu$ = Grand Mean of Species Composition 
+$V_s$ = Factor $V$ (Viereck Classification with $_s$ levels)
+$\alpha_i$ = Factor $\alpha$ (Park) with $_i$ levels 
+$\beta_{(si)j$ = Factor $\beta$ (Plot) with $_j$ levels, which are nested in the combination of $\alpha$ and $V$
+$T_k$ = Factor $T$ (Time) with $_k$ levels 
+$(VT)_{sk}$ = Interaction of Factor $V$ and Factor $T$ with $_{sk}$ levels 
+$\varepsilon_{sijk}$ = Residual Variation 
+
+1. For each determinant subscript (subscript in parentheses) that matches the subscript in the column, write a 1
+2. If any subscripts in a row match the subscript in a column, write a 0 if the column is fixed and a 1 if the column is random. 
+3. For the remaining boxes, write the number of levels from that column 
+
+\begin{table}
+\centering
+\begin{tabular}{|1|1|1|1|1|}
+\hline
+\textbf{Parameter} & \textbf{$V$} & \textbf{$\alpha$} & \textbf{$\beta$} & \textbf{$T$} \\
+\hline
+Fixed or Random & F & F & R & R \\
+\hline 
+Number of Levels & $w$ & $a$ & $b$ & $r$ \\
+\hline 
+Subscript & $s$ & $i$ & $j$ & $k$ \\
+\hline 
+Viereck Class $V_s$ & $0$ & $a$ & $b$ & $r$ \\
+\hline 
+Park $\alpha_i$ & $w$ & $0$ & $b$ & $r$ \\
+\hline 
+Plot $\beta_{(si)j$ & $1$ & $1$ & $1$ & $r$ \\
+\hline 
+Time $T_k$ & $w$ & $a$ & $b$ & $1$ \\
+\hline 
+Interaction $(VT)_{sk}$ & $0$ & $a$ & $b$ & $1$ \\
+\hline 
+Residual Error $\varepsilon_{sijk}$ & $1$ & $1$ & $1$ & $1$ \\
+\hline 
+\end{tabular}
+\caption{Input matrix for partitioning EMS}
+\end{table}
+
+To partition the variance, cover the column of the factor you're working on (go row by row). The product of visible numbers for each column with at least the subscripts from that row is the variance. 
+
+Therefore, for this model, the variance is partitioned like so: 
+
+\begin{table}
+\centering
+\begin{tabular}{|1|1|}
+\hline 
+\textbf{Term} & \textbf{Expected Mean Squared Variance} \\
+\hline 
+Viereck Class $V_s$ & $abr \sum \frac{\alpha i^2}{a-1} + r\sigma^2_{\beta} + ab\sigma^2_{VT} + \sigma^2_{\epsilon}$\\
+\hline 
+Park $\alpha_i$ & $wbr\sigma^2_{\alpha} + r\sigma^2_{\beta} + \sigma^2_{\epsilon}$ \\
+\hline 
+Plot $\beta_{(si)j$ & $r\sigma^2_{\beta} + \sigma^2_{\epsilon}$ \\
+\hline 
+Time $T_k$ & $wab\sigma^2_{T} + ab\sigma^2_{VT} + \sigma^2_{\epsilon}$ \\
+\hline 
+Interaction $(VT)_{sk}$ & $ab\sigma^2_{VT} + \sigma^2_{\epsilon}$ \\
+\hline 
+Residual Error $\varepsilon_{sijk}$ & $\sigma^2_{\epsilon}$ \\
+\hline 
+\end{tabular}
+\caption{Partitioned Variance for each variable}
+\end{table}
+
+Based on the variance partitioning from the above table, the most accurate F tests for each term would be: 
+
+
+\begin{table}
+\centering
+\begin{tabular}{|1|1|}
+\hline 
+\textbf{Term} & \textbf{Associated F Equations} \\
+\hline 
+Viereck Class $V_s$ & $F = \frac{abr \sum \frac{\alpha i^2}{a-1} + r\sigma^2_{\beta} + ab\sigma^2_{VT} + \sigma^2_{\epsilon}}{r\sigma^2_{\beta} + \sigma^2_{\epsilon}} = MS_{Viereck}/MS_{Plot}$\\
+\hline 
+Park $\alpha_i$ & $F = \frac{wbr\sigma^2_{\alpha} + r\sigma^2_{\beta} + \sigma^2_{\epsilon}}{r\sigma^2_{\beta} +\sigma^2_{\epsilon}} = MS_{Park}/MS_{Plot}$ \\
+\hline 
+Plot $\beta_{(si)j}$ & $\frac{r\sigma^2_{\beta} + \sigma^2_{\epsilon}}{\sigma^2_{\epsilon}} = MS_{Plot}/MS{Residual}$ \\
+\hline 
+Time $T_k$ & $F = \frac{wab\sigma^2_{T} + ab\sigma^2_{VT} + \sigma^2_{\epsilon}}{\sigma^2_{\epsilon}} = MS_{Time}/MS_{Residual}$ \\
+\hline 
+Interaction $(VT)_{sk}$ & $F = \frac{ab\sigma^2_{VT} + \sigma^2_{\epsilon}}{\sigma^2_{\epsilon}} = MS_{Interaction}/MS_{Residual}$ \\
+\hline 
+Residual Error $\varepsilon_{sijk}$ & Not Applicable \\
+\hline 
+\end{tabular}
+\caption{Most accurate F tests for each term in defined model. Note: This assumes the contribution of $VT_{sk}$ is nearly zero and can be zeroed out (Threshold = $R^2 < 0.05$)
+\end{table}
+
+Therefore, using the above F equations, we would choose to adjust our F equations when running our adjusted PERMANOVA using the associated function in permanovaTools. 
+
+To test the effects of Viereck Class and Park, we will use run_permanova to adjust our F equations to term/plot instead of the default of term/residual for the most accurate test. 

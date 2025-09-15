@@ -1,0 +1,187 @@
+---
+title: "How to Use permanovaTools"
+output: html_document
+date: "2025-09-14"
+---
+
+## Introduction 
+
+This vignette introduces permanovaTools and shows you how to use each function to run an adjusted PERMANOVA using example data. Sections include 
+
+### Installation 
+
+```{r install}
+remotes::install_github("kimb_pace/permanovaTools")
+```
+
+###
+
+```{r how to structure the dataframe}
+
+
+
+
+
+```
+
+### Basic Usage 
+
+```{r usage}
+
+
+
+
+
+
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+
+
+
+
+
+### Case Study: Spruce Forest Understory Species Composition in Bark Beetle Disturbed Plots 
+
+```{r tutorial}
+#First you need to define your model 
+
+#example call 
+terms <- list(
+  list(name = "Vs", label = "Viereck", main_subscripts = c("s"), determinant_subscripts = character(0), type = "fixed", levels = "a"),
+  list(name = "Pi", label = "Park", main_subscripts = c("i"), determinant_subscripts = character(0), type = "fixed", levels = "b"),
+  list(name = "Tk", label = "Time", main_subscripts = c("k"), determinant_subscripts = character(0), type = "random", levels = "c"),
+  list(name = "Rj(si)", label = "Plot", main_subscripts = c("j"), determinant_subscripts = c("s", "i"), type = "random", levels = "d"),
+  list(name = "Esik", label = "Error", main_subscripts = c("s", "i", "k"), determinant_subscripts = character(0), type = "random", levels = "abc"))
+
+
+#and then generate the matrix that will be used to partition the variance for the model 
+output_matrix <- derive_matrix(terms)
+
+#generate your EMS partitioning and figure out how to structure your F tests 
+  ems_results <- calculate_ems(output_matrix, terms)
+  print(ems_results)
+
+#generate a nicer output to help you see things better 
+  plot_ems(ems_results) #shows in viewer 
+  plot(ems_results, save_to_file = TRUE, filename = "EMS_Results.png")
+
+#Now that you have your model specified and your F tests adjusted (if needed), begin working with your data. 
+
+#Does it need to be balanced first? If so, use balance_data() function. 
+  
+  #First determine whether or not you want to manually specify any plots to be retained (for project specific reasons). 
+
+#Example call
+#If using manual override, specify it first as an object: 
+#manual_override <- list(
+#  Plot1 = c(Year1, Year2, Year3),
+#  PLot2 = c(Year1, Year2, Year3))
+#then call for filtered DF using manual_override criteria, number of visits you want, and your unbalanced data 
+#filtered_df <- balance_visits(
+#  unbalanced_dataframe,
+#  plot_col = "Name of Plot column in your data",
+#  year_col = "Name of year column in your data",
+#  n_visits = 2(or however many you want),
+#  manual_selection = manual_override)
+
+#If you are using a manual override and specifying specific plot visits: 
+balanced_dataframe <- balance_visits(
+  df = unbalanced_dataframe,
+  plot_col = "Name of Plot column in your data",
+  year_col = "Name of year column in your data",
+  n_visits = 2(or however many you want),
+  manual_selection = list(
+    "Plot1" = c(Year1, YEar2),
+    "Plot2" = c(Year1, Year2)))
+
+#if manual override is not utilized and you are wanting the script to decide: 
+#the only difference is you're specifying that selection is null: 
+balanced_datafrane <- balance_visits(
+  df = unbalanced_dataframe,
+  plot_col = "Name of Plot column in your data",
+  year_col = "Name of year column in your data",
+  n_visits = 2(or however many you want),
+  manual_selection = NULL)
+
+#if your data include multiple visits per year, use this structure: 
+balanced_dataframe <- balance_visits(df = unbalanced_dataframe,
+               plot_col = "Name of Plot column in your data",
+               year_col = "Name of year column in your data",
+               visit_col = "name of month column, must be in Month_Year format", #ie 2020_06
+               n_visits = 2,
+               multiple_visits_per_year = TRUE, #specify if each year has multiple visits here 
+               require_all_years = TRUE) #if you're trying to balance the years so every year has the same number of months, use true 
+
+#from here, if you have successfully balanced your data, you can move on to running the PERMANOVA. 
+
+#if you didn't need to balance your data and it was already balanced, upload your data like so: 
+
+#Load data 
+beetle_df <- read_xlsx(here("beetle_df_vasc_filtered.xlsx"))
+
+
+
+#if you have 
+beetle_env <- read_xlsx(here("beetle_env_vasc_filtered.xlsx"))
+
+#Format matrix 
+beetle_composition <- beetle_df[,c(8:261)]
+beetle_composition <- as.matrix(beetle_composition) 
+
+#if using balanced dataframe from above, split off the species data from the main data table 
+
+
+
+
+
+
+
+#design options for restricted permutation structure 
+#time is permuted 
+perm_design_beetle_time = how(
+  plots = Plots(strata = beetle_env$Plot, type = c("free")),
+  within = Within(type = "series", mirror = FALSE),
+  nperm = 999)
+#time is not permuted
+perm_design_beetle = how(
+  plots = Plots(strata = beetle_env$Plot, type = c("free")),
+  within = Within(type = "none"),
+  nperm = 999)
+
+#testing the call using multiple corrected F equations that use the same permutation restrictions 
+multiple_term_result <- adjusted_permanova(
+  data = beetle_env, 
+  matrix = beetle_composition, 
+  base_permutations = perm_design_beetle_time,
+  corrected_F_equations = list(
+    "Viereck.3/Plot" = perm_design_beetle,
+    "Park/Plot" = perm_design_beetle),
+  terms = "Viereck.3 + Park + Plot + Sample_Year + Viereck.3*Sample_Year",
+  by = "terms",
+  method = "bray") 
+```
+
+### Advanced Usage 
+All of the customization and options for each function 
+
+```{r advanced usage}
+
+
+
+
+```
+### References 
+
+
+
+
+
+
+
+
+

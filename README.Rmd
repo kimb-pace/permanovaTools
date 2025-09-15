@@ -1,17 +1,8 @@
----
-title: "README"
-output: html_document
-date: "2025-09-15"
----
+permanovaTools
 
-# permanovaTools
-
-This repository houses the scripts for the R package **permanovaTools**, and serves as the download source for the package.
+This repository houses the scripts for the R package permanovaTools, and serves as the download source for the package.
 
 This package provides functions for calculating adjusted F-statistics in PERMANOVA and running adjusted PERMANOVA models in conjunction with modified permutation structures. Includes functions for balancing data, custom EMS derivation, and variance partitioning tailored for ecological datasets. 
 
-## Installation Instructions 
-
-```{r}
+Installation Instructions 
 devtools::install_github(“kimb_pace/permanovaTools”)
-```

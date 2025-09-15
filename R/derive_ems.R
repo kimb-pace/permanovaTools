@@ -6,6 +6,12 @@
 #' associated with each term in a model, using a matrix representation of 
 #' subscripts, nesting, and factor types that is generated using the \code{generate_ems_matrix} function. 
 #'
+#' It differs from the \code{varpart} function in \code{Vegan} which is primarily used for RDA, CCA, and PCA and uses a response matrix 
+#' rather than a distance matrix and also computes the fraction of variance per factor based on a set of predictors rather than the F statistic. 
+#' \code{varpart} is useful for linear models and raw species matrices but relies on euclidian distances which are often not 
+#' applicable to PERMANOVA models. 
+#'
+#'
 #' @param output_matrix A matrix where rows represent model terms,
 #' and columns represent subscripts. The top three rows include:
 #'   - "Fixed or random": indicates whether each model term is fixed ("F") or random ("R")

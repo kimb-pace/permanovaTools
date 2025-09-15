@@ -1,10 +1,17 @@
 #' balance_data: Balance Plot Visits for PERMANOVA 
 #'
-#' This function subsets a data frame containing ecology data (specifically species composition data in the form of presence/absence, abundance, or quadrat frequency) to include a specified number of 
+#' This function subsets a data frame containing ecology data (specifically species composition data in the form of presence/absence, 
+#' abundance, or quadrat frequency) to include a specified number of 
 #' plots per sampling unit (ie years, months, parks, vegetation classes, etc) for balanced PERMANOVA using \code{adonis2} from the \code{vegan} package.
-#' If some plots have more visits than the desired number, this function selects a subset of years that are most similar to those in plots already balanced at the target number of visits. 
-#' The subset is created based on similarity patterns across input data. This function can be used to balance visits either across years or within years (such as monthly samples). It selects visits so 
-#' that the specified grouping parameters have an equal number of plots or return visits \code{n_visits}. Plots with fewer than the number of plots specified will be excluded, and plots with a greater 
+#' In principle, sampling designs are constructed to be balanced, so under ideal conditions no additional filtering is needed for analysis. 
+#' In practice, however, unforseen factors can disrupt data collection and lead to missing or unusable samples. This function saves time by allowing users to set 
+#' parameters to filter data without having to manually screen observations.  
+#' If some plots have more visits than the desired number, this function selects a subset of years that are most similar to those in 
+#' plots already balanced at the target number of visits. 
+#' The subset is created based on similarity patterns across input data. This function can be used to balance visits either across years or within 
+#' years (such as monthly samples). It selects visits so 
+#' that the specified grouping parameters have an equal number of plots or return visits \code{n_visits}. Plots with fewer than the number of plots 
+#' specified will be excluded, and plots with a greater 
 #' number of visits are filtered to match the most common combination of return visits (units?) found among plots with the specified number of visits.
 #' An optional manual override allows the user to decide to retain specific visits regardless of the similarity to other plots. 
 #'

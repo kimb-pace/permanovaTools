@@ -6,7 +6,12 @@ date: "2025-09-14"
 
 ## Introduction 
 
+
+-how to do the rationale workflow with the code of the package 
+-example with beetle data (balance and permanova)
+
 This vignette introduces permanovaTools and shows you how to use each function to run an adjusted PERMANOVA using example data. Sections include 
+
 
 ### Installation 
 
@@ -18,32 +23,13 @@ remotes::install_github("kimb_pace/permanovaTools")
 
 ```{r how to structure the dataframe}
 
-
-
-
-
 ```
 
 ### Basic Usage 
 
 ```{r usage}
 
-
-
-
-
-
-
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
-
-
-
-
-
-
-
 
 ### Case Study: Spruce Forest Understory Species Composition in Bark Beetle Disturbed Plots 
 

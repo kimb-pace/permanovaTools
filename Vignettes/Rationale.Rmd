@@ -1,9 +1,3 @@
----
-title: "Rationale"
-output: html_document
-date: "2025-09-14"
----
-
 ## Rationale 
 
 -why method exists 
@@ -18,7 +12,7 @@ In simple models, the F test usually works out to the standard $MS_{Factor}/MS_{
 
 An easy example could be: 
 
-$y_{ij} = \mu + A_i + B_{(i)j} + \varepsilon_{ij}$
+$$y_{ij} = \mu + A_i + B_{(i)j} + \varepsilon_{ij}$$
 
 Where: 
 $y_{ij}$ = Species Composition
@@ -34,7 +28,7 @@ Adjusting the F equations helps reduce Type 1 error problems and leads to higher
 
 The following workflow is an example of a full variance partitioning workflow for a nested model containing four terms, two fixed and two random, with one interaction. 
 
-$y_{ijk} = \mu + V_s + \alpha_i + \beta_{(si)j} + T_k + (VT)_{sk} + \varepsilon_{sijk}$, where: 
+$$y_{ijk} = \mu + V_s + \alpha_i + \beta_{(si)j} + T_k + (VT)_{sk} + \varepsilon_{sijk}$$, where: 
 
 $y_{ijk}$ = Species Composition
 $\mu$ = Grand Mean of Species Composition 
@@ -138,6 +132,24 @@ Varpart() in Vegan partitions raw data variance using Euclidian distances, which
 
 
 
+****OK this is going to be rough but I am going to make a paraphrased draft of the methods section of the manuscript so its not just copy paste, and then I'll edit it from there:****
+
+The way that this function works is that instead of altering the base mechanics of \adonis2, it uses loops to run through x amount of iterations of the model (x = n permutations, set according to the model chosen). A permutation object is created that stores x amount of versions of your permuted data. A results object is created to store the sums of squares for each of the x amount of permutations for every term in the model. 
+
+Then, a loop is used to run a single iteration of the PERMANOVA model with zero permutations for every single line in the permutation object. The sums of squares from each run are saved in the results object. The actual data are preserved on the first line and the remaining lines are shuffled versions of that data (within the constraints of how you outline your permutations). From there, columns are created to calculate the F values for each permutation and the original data. And using that F distribution, the adjusted P value is calculated using the following equation: 
+
+$$ P = \frac{\sum_{i=1}^{N} \mathbf(F_i^\text{perm} > F^\text{obs})}{N} $$
+Where N = Total number of permutations 
+
+
+
+
+
+
+
+
+
+
 
 Balancing rationale 
 
@@ -149,6 +161,6 @@ Generally, sample designs are balanced in their design and if all goes to plan, 
 
 In principle, sampling designs are constructed to be balanced, so under ideal conditions no additional filtering is needed for analysis. In practice, however, unforseen factors can disrupt data collection and lead to missing or unusable samples. These disruptions include (but are not limited to) inaccessible plots, travel constraints, disturbances such as fire or flooding, loss of project funding, or data loss. In these instances where you unexpectedly find yourself with unbalanced observations, the choice is to either exclude the incomplete unit (ie plot with less revisits than the rest of the plots) from the design or reduce the other units to match the incomplete one. This action would restore balance to the design and allow for accurate and unbiased analysis despite the disruption. This can be done by hand but for large datasets common in species composition surveys it can be tedious and time consuming to manually filter and remove data, so using a function that allows for a combination of auto-selection and manual selection of data can save time while still preserving control over experimental structure. 
 
-
+For example, using the balance_data example, 
 
 

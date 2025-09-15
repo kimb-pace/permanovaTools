@@ -14,7 +14,6 @@ library(here)
 #'This function gives you the option to test alternate hypotheses involving adjusted F-ratios,
 #'which is done by applying different permutation control structures to the numerator and denominator terms
 #'of the F-test and by specifying the desired numerator and denominator associated with your specified hypotheses. 
-#'It differs from the varpart() function in Vegan because instead of using 
 #'
 #'@param data A data frame containing the grouping variables (factors) associated with each unit (such as plot or visit).
 #'@param matrix A raw data matrix (which will be converted to a distance matrix internally using the distance parameter you specify) that 

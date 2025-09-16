@@ -1,4 +1,10 @@
- #derive EMS function documentation 
+To Do: 
+  1. Finish roxygen documentation 
+  2. finalize function script once you can accomodate nesting in build matrix, make sure the functions can still work with each other 
+  3. clean up final function script without all unnecessary dev comments 
+
+
+
 
 #' Calculate Expected Mean Squares (EMS) from Output Matrix
 #'

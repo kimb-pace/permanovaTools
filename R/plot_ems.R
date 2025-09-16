@@ -1,7 +1,4 @@
- #PLOT EMS RESULTS PRETTY ?????? becasue this current output is ugly AF   >:( 
-
-#does write tipsy edit sober hold up for writing code like it did for both of my thesises? theses. thesis x 2. i guess there is only 
-#one way to find out! stay tuned lol 
+#PLOT EMS RESULTS PRETTIER ?????? becasue this current output is ugly  >:( 
 
 plot.new()
 #create PNG to save the plot to 

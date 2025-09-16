@@ -1,4 +1,38 @@
-#PLOT EMS RESULTS PRETTIER ?????? becasue this current output is ugly  >:( 
+ideas to add: 
+  
+  1. add a highlighted line or two. highlight_term = NULL or otherwise ie if you want to bold a line to use as an adjusted F equation 
+  2. need to fix the fixed effect summation formula from phi to the actual one. once you figure out how to code it here 
+  3. save as pdf? instaed of png. maybe have two options? 
+  4. add in there the F equation if specifying separately. so maybe in the bottom or right you can pull the variance from the line and 
+      just visually show it as x/x for fun 
+
+
+#' Plot Expected Mean Squares (EMS) Expressions 
+#' 
+#' This function uses the output from the calculate_ems function and plots it nicely in the R plot window or saves it to files in your directory. It generates a clearer 
+#' output that is easier to interpret, allowing for easier decision making and methods reporting. 
+#' 
+#' @param ems_results A named list of EMS expressions from calculate_ems function output 
+#' @param title The title of the plot, ie the model if more than one output is desired to be plotted 
+#' @param cex font size 
+#' @param save_to_file logical statement, if TRUE saves as a PNG file to your directory 
+#' @param file_name Output file name (if = TRUE for save_to_file)
+#' 
+#' @return An output file (.png or .pdf) containing an organized, cleaned up display of the partitioned variance for a specified model. 
+#'         This output contains the specified model, list of associared terms, partitioned variance components, and the correct F equations for each term in said model.  
+#' 
+#' @export
+#' 
+#' @example 
+#' ems_results <- calculate_ems(output_matrix, terms) #do the variance partitioning using 
+#' plot_ems(ems_results) #shows in viewer 
+#' plot(ems_results, save_to_file = TRUE, filename = "name.png")
+#' 
+#' 
+#' @details This function exists simply to improve interpretation and reporting of variance partitioning, it is not essential to running an adjusted PERMANOVA. 
+#'  
+
+
 
 plot.new()
 #create PNG to save the plot to 
@@ -43,24 +77,10 @@ text(
 
 
 
-#maybe turn plot_ems into a function to help with looking at results? 
-
-#' Plot Expected Mean Squares (EMS) Expressions 
-#' 
-#' This function takes the output from the calculate_ems function and plots it nicely in the R plot window or saves it to files in your directory.
-#' 
-#' @param ems_results A named list of EMS expressions from calculate_ems function output 
-#' @param title The title of the plot, ie the model if more than one output is desired to be plotted 
-#' @param cex font size 
-#' @param save_to_file logical statement, if TRUE saves as a PNG file to your directory 
-#' @param file_name Output file name (if = TRUE for save_to_file)
-#' 
-#' @export
-#' 
-#' 
-#'    
+  
 
 
+#function start 
 
 plot_ems <- function(ems_results, title = "Expected Mean Squared Variance",
                      cex = 1.5, save_to_file = FALSE,
@@ -73,24 +93,13 @@ plot_ems <- function(ems_results, title = "Expected Mean Squared Variance",
   par(mar = c(4, 4, 2, 2))
   n_terms <- length(ems_results)
   
-  #add in here the specifications from above: 
   
   
   
   
   
   
-  call: 
-    ems_results <- calculate_ems(output_matrix, terms)
-  plot_ems(ems_results) #shows in viewer 
-  plot(ems_results, save_to_file = TRUE, filename = "name.png")
+
   
   
   
-  ideas to add: 
-    
-    1. add a highlighted line or two. highlight_term = NULL or otherwise ie if you want to bold a line to use as an adjusted F equation 
-  2. need to fix the fixed effect summation formula from phi to the actual one. once you figure out how to code it here 
-  3. save as pdf? instaed of png 
-  4. add in there the F equation if specifying separately. so maybe in the bottom or right you can pull the variance from the line and 
-  just visually show it as x/x for fun 

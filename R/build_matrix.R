@@ -1,13 +1,3 @@
-#TO DO: 
-  #1. add in nesting to function script to accommodate more complex models
-  #2. finish roxygen documentation 
-  #3. remove loose script once function is complete 
-  #4. clean up final function script without all unnecessary dev comments 
-
-
-
-
-
 #' Generate Output Matrix for Deriving Expected Mean Squares    
 
 #' Derive EMS Input Matrix 
@@ -70,29 +60,6 @@
 #' to further understand the mechanics behind this function, see: 
 #' \url{insert bib citation once you figure that out}
 
-
-
-
-
-#first make the output matrix with a simple model 
-#Simple model: Vs + Pi + Tk + Esik 
-
-terms <- list(
-  list(name = "Vs", label = "Viereck", subscripts = c("s"), type = "fixed", levels = "a"),
-  list(name = "Pi", label = "Park", subscripts = c("i"), type = "fixed", levels = "b"),
-  list(name = "Tk", label = "Time", subscripts = c("k"), type = "random", levels = "c"),
-  list(name = "Esik", label = "Error", subscripts = c("s", "i", "k"), type = "random", levels = "abc"))
-
-
-#goal: 
-Fixed or random:      F   F   R 
-Number of levels:     a   b   c
-Subscript:            s   i   k 
-Vs 
-Pi 
-Tk 
-Esik
-
 #function start 
 derive_matrix <- function(terms) {
   is_error <- sapply(terms, function(x) x$label == "Error") #first identify the error term in the input 
@@ -153,33 +120,37 @@ derive_matrix <- function(terms) {
   }
 
 
+#TO DO: 
+#1. add in nesting to function script to accommodate more complex models
+#2. finish roxygen documentation 
+#3. remove loose script once function is complete 
+#4. clean up final function script without all unnecessary dev comments 
 
-#call 
+#goal: 
+Fixed or random:      F   F   R 
+Number of levels:     a   b   c
+Subscript:            s   i   k 
+Vs 
+Pi 
+Tk 
+Esik
+
+#test calls 
+
+#first make the output matrix with a simple model: Vs + Pi + Tk + Esik 
+
+terms <- list(
+  list(name = "Vs", label = "Viereck", subscripts = c("s"), type = "fixed", levels = "a"),
+  list(name = "Pi", label = "Park", subscripts = c("i"), type = "fixed", levels = "b"),
+  list(name = "Tk", label = "Time", subscripts = c("k"), type = "random", levels = "c"),
+  list(name = "Esik", label = "Error", subscripts = c("s", "i", "k"), type = "random", levels = "abc"))
+
 terms <- list(
   list(name = "Vs", label = "Viereck", main_subscripts = c("s"), determinant_subscripts = character(0), type = "fixed", levels = "a"),
   list(name = "Pi", label = "Park", main_subscripts = c("i"), determinant_subscripts = character(0), type = "fixed", levels = "b"),
   list(name = "Tk", label = "Time", main_subscripts = c("k"), determinant_subscripts = character(0), type = "random", levels = "c"),
   list(name = "Rj(si)", label = "Plot", main_subscripts = c("j"), determinant_subscripts = c("s", "i"), type = "random", levels = "d"),
   list(name = "Esik", label = "Error", main_subscripts = c("s", "i", "k"), determinant_subscripts = character(0), type = "random", levels = "abc"))
-
-output_matrix <- derive_matrix(terms)
-
-#results 
-
-hopefully would give us something like this: (except prettier) 
-
-s    i    k 
-Fixed or Random     F    F    R 
-Number of Levels    a    b    c 
-Subscript           s    i    k 
-Vs                  0    a   a
-Pi                  a    0    a 
-Tk                 a    a     1 
-Esik                a   b    c 
-
-
-
-#EMS function - MATRIX GENERATION 
 
 #draft input for complex model 
 terms <- list(
@@ -191,119 +162,4 @@ terms <- list(
   list(name = "Esijk", label = "Residual", subscripts = c("s", "i", "j", "k"), type = "random", levels = "abcd"))
 #NOT ready for this biz ^^^^ 
 
-
-
-
-
-
-
-
-
-
-
-
-
-#concept work, frankenstein code 
-
-#assign the error term 
-is_error <- sapply(terms, function(x) x$label == "Error")
-
-#extract all non error subscripts for making the columns. unlist error = removes the one labeled error
-#lapply function applies a function to each element of a list and returns a list 
-#function(x) x$sunscripts - for each item x in the list, it extracts x$subscripts so that 
-#can have as many subscripts as you put in the input function that aren't error
-#unlist flattens the subscripts into a single vector after theyve been in multiple in the input i think 
-#unique removes duplicates - there shouldnt be any but have this just in case as a failsafe because I do be making errors 
-subscripts <- unique(unlist(lapply(terms[!is_error], function(x) x$subscripts)))
-
-#create data rows for the header and tells you if each subscript is associated with a fixed or random term from the input 
-#for each term (x, so as many as you input that arent errors), it checks if subscript (s) is associated with term x
-#[[1]] only use first matching term, assumes one subscript belongs to one term. will need to possibly change this if using nesting
-
-
-#identify the error term and assign it as error 
-#logical for a logical vector (true or false)
-is_error <- logical(length(terms))
-#seq_along for looping through list to check if terms are error and if so gets "true" assigned in logical vector 
-for (i in seq_along(terms)) {
-  is_error[i] <- terms[[i]]$label == "Error"}
-
-#object containing all non-error subscritps 
-subscripts_list <- list()
-#check to make sure error is not incldued in terms - look for true 
-#is_error[i, number of terms] == true, skip, ==false, record. +1 = next available index i (i = 1,2,3,4... depending on input)
-#basically just loops through and adds subscripts to a list, then unlist to flatten, then make sure theyre unique and not duplicated 
-for (i in seq_along(terms)) {
-  if (!is_error[i]) {
-    subscripts_list[[length(subscripts_list) + 1]] <- terms[[i]]$subscripts}}
-#makes lsit of all unique subscripts 
-subscripts <- unique(unlist(subscripts_list))
-
-#extract fixed or random for each subscript 
-#same as above but for assigning F or R based on input 
-fixed_or_random <- character(length(subscripts))
-names(fixed_or_random) <- subscripts
-#loop through each subscript 
-for (s in subscripts) {
-  #for each subscript (s) check each term to see which terms are associated with it, because some terms could both have the same subscript if nested
-  for (term in terms) {
-    #checks if term label is not error and if the term's subscript incldues the current s subscript. if true then assigns 
-    if (term$label != "Error" && s %in% term$subscripts) {
-      fixed_or_random[s] <- if (term$type == "fixed") "F" else "R"
-      break}}}
-#levels as an object 
-#same as above but for assigning levels associated with the input for each unique term 
-levels_row <- character(length(subscripts))
-names(levels_row) <- subscripts
-for (s in subscripts) {
-  for (term in terms) {
-    if (term$label != "Error" && s %in% term$subscripts) {
-      levels_row[s] <- term$levels
-      #stop looking once term is found 
-      break}}}
-
-#subscript names as an onject 
-subscripts_row <- subscripts
-
-#get the term names for the matrix and make it into an object 
-term_names <- character(length(terms))
-for (i in seq_along(terms)) {
-  term_names[i] <- terms[[i]]$name}
-
-#create the framework for output matrix 
-output_matrix <- matrix("", nrow = 3 + length(terms), ncol = length(subscripts),
-                        dimnames = list(c("Fixed or random", "Number of levels", "Subscript", term_names), subscripts))
-
-#fill in header rows for output matrix 
-output_matrix["Fixed or random", ] <- fixed_or_random
-output_matrix["Number of levels", ] <- levels_row
-output_matrix["Subscript", ] <- subscripts_row
-
-#subscript type for numeric values (0 = fixed, 1 = random)
-subscript_type <- integer(length(subscripts))
-names(subscript_type) <- subscripts
-for (s in subscripts) {
-  for (term in terms) {
-    if (term$label != "Error" && s %in% term$subscripts) {
-      subscript_type[s] <- if (term$type == "fixed") 0 else 1
-      break}}}
-
-#fill in the rows based on subscript 
-for (term in terms) {
-  for (s in term$subscripts) {
-    if (s %in% subscripts) {
-      output_matrix[term$name, s] <- as.character(subscript_type[s])}}}
-
-#fill in remaining empty cells with the level of the column
-for (term in term_names) {
-  for (s in subscripts) {
-    if (output_matrix[term, s] == "") {
-      output_matrix[term, s] <- levels_row[s]}}}
-
-#output matrix 
-print(output_matrix, quote = FALSE)    
-
-
-
-
-
+output_matrix <- derive_matrix(terms)

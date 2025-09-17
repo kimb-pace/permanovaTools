@@ -1,11 +1,3 @@
-To Do: 
-  1. Finish roxygen documentation 
-  2. finalize function script once you can accomodate nesting in build matrix, make sure the functions can still work with each other 
-  3. clean up final function script without all unnecessary dev comments 
-
-
-
-
 #' Calculate Expected Mean Squares (EMS) from Output Matrix
 #'
 #' This function derives the partitioned variance for the Expected Mean Squares (EMS)
@@ -56,7 +48,6 @@ To Do:
 #' @export
 
 #function script 
-#input your matrix from above function when I finish it, and the terms which is a list that you specify with saying its fixed or random etc.
 calculate_ems <- function(output_matrix, terms) {
   term_names <- rownames(output_matrix)[-(1:3)]  #skip header rows (ie the number of levels and fixed or random)
   subscripts <- colnames(output_matrix) #pulls the column names and assigns them as the subscripts 
@@ -126,3 +117,12 @@ calculate_ems <- function(output_matrix, terms) {
   #print results 
   ems_results <- calculate_ems(output_matrix, terms)
   print(ems_results)
+  
+  
+#To Do: 
+#  1. Finish roxygen documentation / update examples in documentation 
+#  2. finalize function script once you can accomodate nesting in build matrix, make sure the functions can still work with each other 
+#  3. clean up final function script without all unnecessary dev comments 
+  
+  
+  

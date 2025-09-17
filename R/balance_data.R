@@ -80,7 +80,7 @@
 #'
 #' @export    
 
-#run devtools::document() once all of this is complete 
+#note: run devtools::document() once all of this is complete 
 
 
 #balancing function 
@@ -228,30 +228,11 @@ balance_visits <- function(df,
         print(under_plots[[plot_col]])}
       return(list(
         filtered_dataframe = filtered_dataframe,
-        summary_table = summary_table))}}
+        summary_table = summary_table))}}}
 
-#it should look like this: 
-#balance summary 
-#plots with exact/trimmed years (auto): X
-#plots with manual override: X
-#dropped X plots with fewer than X visits: 
-#and then here is where it will tell you which plots were dropped 
+#Example Calls 
 
-#Example call
-#first specify manual override if using 
-manual_override <- list(
-  KATM_2009_01_S996 = c(2012, 2014, 2019),
-  LACL_2010_01_S995 = c(2012, 2014, 2019))
-#then call for filtered DF using criteria 
-filtered_df <- balance_visits(
-  quad_abundance_df_vascular_filtered,
-  plot_col = "Plot",
-  year_col = "Sample_Year",
-  n_visits = 2,
-  manual_selection = manual_override)
-
-
-#updated call with manual override built in instead of separate item 
+#balance by year
 result <- balance_visits(
   df = quad_abundance_df_vascular_filtered,
   plot_col = "Plot",
@@ -259,15 +240,7 @@ result <- balance_visits(
   n_visits = 2,
   manual_selection = list(
     "KATM_2009_01_S996" = c(2012, 2014),
-    "LACL_2010_01_S995" = c(2014, 2019)))
-
-#otehr call option, if manual override is not utilized 
-result <- balance_visits(
-  df = quad_abundance_df_vascular_filtered,
-  plot_col = "Plot",
-  year_col = "Sample_Year",
-  n_visits = 2,
-  manual_selection = NULL)
+    "LACL_2010_01_S995" = c(2014, 2019))) #or manual_selection = NULL 
 
 #balance by month 
 balance_visits(df = quad_abundance_df_vascular_filtered,
@@ -286,33 +259,3 @@ balance_visits(df = quad_abundance_df_vascular_filtered,
 
 
 
-
-
-#Original script - not a function 
-#hand select the years for plots with more than the decided number of visits 
-filter_criteria <- list(
-  Plot1 = c(Selected_Year, Selected_Year, Selected_Year),
-  Plot2 = c(Selected_Year, Selected_Year, Selected_Year),
-  Plot3 = c(Selected_Year, Selected_Year, Selected_Year),
-  Plot4	= c(Selected_Year, Selected_Year, Selected_Year))
-
-#next identify plots with three plot visits from your vegetation class (or whatever the number you've decided is)
-selected_plots <- summary_table_of_choice %>%
-  filter(Vegetation_Class == "Desired Vegetation Class", Number_Visits == 3) %>%
-  pull(Plot)
-
-#combine plots with hand selected plots from filter criteria 
-selected_plots <- union(selected_plots, names(filter_criteria))
-
-#subset main presence absence dataframe based on both conditions 
-#verify that the hand selected plots were correctly pulled 
-subset_hand_selected <- quad_abundance_dataframe_of_choice %>%
-  filter(
-    Plot %in% names(filter_criteria) & 
-      Sample_Year %in% unlist(filter_criteria[Plot]))
-
-balanced_df <- quad_abundance_dataframe_of_choice %>%
-  filter(
-    (Plot %in% selected_plots) | 
-      (Plot %in% names(filter_criteria) &
-         Sample_Year %in% unlist(filter_criteria[Plot])))

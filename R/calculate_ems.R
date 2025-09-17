@@ -93,8 +93,18 @@ calculate_ems <- function(output_matrix, terms) {
         
         #determine if fixed or random
         this_type <- terms[[which(sapply(terms, function(x) x$name == other_term))]]$type
-        scale_symbol <- if (this_type == "random") paste0("sigma^2[", other_term, "]") else paste0("phi[", other_term, "]")
-        #assigns sigma2 to random variance and i can't figure out how to make it assign the summation notation easily so i just said phi. i'll fix this in an update soon
+        n_levels <- as.numeric(levels_lookup[other_term])
+        
+        if (this_type == "random") {
+          scale_symbol <- bquote(sigma^2[.other_term)])
+      } else {
+          scale_symbol <- bquote(frac(1, .n_levels) -1) *
+            sum(alpha[i]^2, i ==1, .(n_levels)))
+        }
+        
+            #scale_symbol <- if (this_type == "random") paste0("sigma^2[", other_term, "]") else paste0("phi[", other_term, "]")
+            #assigns sigma2 to random variance and i can't figure out how to make it assign the summation notation easily so i just said phi. i'll fix this in an update soon
+                #FIXED^^^
         
         #checks if scaling multiplier is needed, formats teh component correctly, and adds it to a list of terms that will be summed together to form the full EMS for that term 
         #product_expr is the string that is the product of used factor levels (NOT IN THE CURRENT TERMS SUBSCRIPTS) but in the contributing term 

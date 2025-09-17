@@ -4,46 +4,173 @@ output: html_document
 date: "2025-09-14"
 ---
 
-## Introduction 
+# Introduction 
+
+This vignette introduces permanovaTools and shows you how to use each function to run an adjusted PERMANOVA using example data. 
+
+Sections include: 
+1. Basic Usage with template code 
+2. Case study using example data 
+ 
 
 
--how to do the rationale workflow with the code of the package 
--example with beetle data (balance and permanova)
-
-This vignette introduces permanovaTools and shows you how to use each function to run an adjusted PERMANOVA using example data. Sections include 
 
 
-### Installation 
+
+## Installation 
 
 ```{r install}
 remotes::install_github("kimb_pace/permanovaTools")
 ```
 
-###
+## Basic Usage: 
 
-```{r how to structure the dataframe}
+First, input your model and store it as an object. 
 
-```
+```{r Input Terms}
 
-### Basic Usage 
-
-```{r usage}
-
-```
-
-### Case Study: Spruce Forest Understory Species Composition in Bark Beetle Disturbed Plots 
-
-```{r tutorial}
-#First you need to define your model 
-
-#example call 
 terms <- list(
   list(name = "Vs", label = "Viereck", main_subscripts = c("s"), determinant_subscripts = character(0), type = "fixed", levels = "a"),
   list(name = "Pi", label = "Park", main_subscripts = c("i"), determinant_subscripts = character(0), type = "fixed", levels = "b"),
   list(name = "Tk", label = "Time", main_subscripts = c("k"), determinant_subscripts = character(0), type = "random", levels = "c"),
   list(name = "Rj(si)", label = "Plot", main_subscripts = c("j"), determinant_subscripts = c("s", "i"), type = "random", levels = "d"),
   list(name = "Esik", label = "Error", main_subscripts = c("s", "i", "k"), determinant_subscripts = character(0), type = "random", levels = "abc"))
+```
 
+Next, use this object to build the matrix that will be used to partition the variance for your specified model. 
+
+```{r Build EMS Matrix}
+
+#****** NOTE: possibly will combine this function with the calculate ems function so it's 100% internal but in the build process it was just easier to split them up. I also did it this way so that the object output was easy to use for plot_ems but again I could probably build it in to have the variance object as an output... i don't know yet. mike if you're reading this as a potential future user of this package let me know what you think
+
+output_matrix <- derive_matrix(terms)
+```
+
+Now you have an output that looks something like this, depending on the model input you have specified: 
+
+s    i    k 
+Fixed or Random     F    F    R 
+Number of Levels    a    b    c 
+Subscript           s    i    k 
+Vs                  0    a    a
+Pi                  a    0    a 
+Tk                  a    a    1 
+Esik                a    b    c 
+
+Next, you will use this matrix output as well as the terms object in order to partition the variance of your model. 
+
+```{r Partition Variance}
+ems_results <- calculate_ems(output_matrix, terms)
+print(ems_results)
+```
+
+This will give you an output in the console that contains the partitioned variance associated with each term in your model. It will look something like this: 
+
+Variance Matrix Console Output Example: 
+
+
+
+
+
+
+
+This output can be used as-is, but it might be a little hard to read using the console formatting for mathematical terms. To assist with viewing, you can use the plot_ems() function to convert this output into correct notation. 
+
+```{r Plot EMS}
+ plot_ems(ems_results, 
+         title = "Plot Name",
+         cex = 1.2)
+```
+
+Using this output or the raw console output from ems_results, you can then determine whether or not you will need to adjust any of your F equations. If you determine that you will not need to adjust any F equations for your specified model, use adonis2 as standard. If you determine that one or more of your F equations will need their denominator adjusted, use run_permanova() to manually adjust your PERMANOVA. 
+
+Before running adjust_permanova(), however, ensure that your data are in the correct format for this function to operate. 
+
+Load your data and first ensure that it is structured such that there are the following columns: 
+
+1. Plot ID 
+2. Time Column 
+3. Columns for each fixed or random factor included in your model 
+4. Species data columns (one column for each species code with abundance or presence/absence data recorded for each plot)
+
+Note: Each plot visit needs to be its own row. Create a column that is a combination of plot and time to create a unique visit identifier. 
+
+If the data are already balanced and no exclusions need to be done, then balance_data() does not need to be used. However, if there are unequal numbers of plot visits or unbalanced sampling that needs to be filtered, then use balance_data() to filter your dataframe. 
+
+```{r Balance Data}
+balanced_data <- balance_visits(
+   df = veg_df,
+   plot_col = "Plot",
+   year_col = "Year",
+   balance_col = "Year"
+   n_visits = 2,
+   manual_selection = manual_years) 
+```
+
+If you want to ensure that specific visits are included and not filtered, specify them here: 
+```{r Balance Data - Manual Selection}
+ manual_years <- list(
+   "Plot4" = c(2012, 2015),
+   "Plot5" = c(2013, 2016))
+
+```
+
+Now that the dataframe has been filtered, split it into two items: 
+
+1. a dataframe containing the variable data for each plot visit 
+2. a matrix containing all of the species data 
+
+```{r Create Data Objects}
+species_data <- balanced_data[,c(8:261)]
+species_data <- as.matrix(species_data) 
+variable_data <- balanced_data[,c(1:7)]
+```
+
+Next, define permutation structure restrictions with permute() if using: 
+
+```{r Define Permutation Structures}
+permutation_structure_1 <- how(plots = Plots(strata = variable_data$FactorB, type = c("free")), within = Within(type = "free"), nperm = 999)
+permutation_structure_2 <- how(Plots(strata = variable_data$FactorB, type = c("free")), within = Within(type = "series", mirror = FALSE), nperm = 999)
+```
+
+Now that you have everything prepared, use run_permanova() to complete your analysis. 
+
+```{r Run PERMANOVA}
+adjusted_permanova(
+   data = variable_data,
+   matrix = species_matrix,
+   base_permutations = ps1,
+   corrected_F_equations = list("A/B" = ps1, "C/A" = ps2),
+   terms = "A + B + C",
+   by = "terms", 
+   method = "bray")
+```
+
+This will create an output in the console that is synonymous with the Adonis2 console output, but replaces corrected F and P values where specified leading to ease of interpretation. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Case Study: Spruce Forest Understory Species Composition in Bark Beetle Disturbed Plots 
+
+```{r Beetle Example: Build Model}
+terms <- list(
+  list(name = "Vs", label = "Viereck", main_subscripts = c("s"), determinant_subscripts = character(0), type = "fixed", levels = "a"),
+  list(name = "Pi", label = "Park", main_subscripts = c("i"), determinant_subscripts = character(0), type = "fixed", levels = "b"),
+  list(name = "Tk", label = "Time", main_subscripts = c("k"), determinant_subscripts = character(0), type = "random", levels = "c"),
+  list(name = "Rj(si)", label = "Plot", main_subscripts = c("j"), determinant_subscripts = c("s", "i"), type = "random", levels = "d"),
+  list(name = "Esik", label = "Error", main_subscripts = c("s", "i", "k"), determinant_subscripts = character(0), type = "random", levels = "abc"))
 
 #and then generate the matrix that will be used to partition the variance for the model 
 output_matrix <- derive_matrix(terms)
@@ -151,18 +278,6 @@ multiple_term_result <- adjusted_permanova(
   by = "terms",
   method = "bray") 
 ```
-
-### Advanced Usage 
-All of the customization and options for each function 
-
-```{r advanced usage}
-
-
-
-
-```
-### References 
-
 
 
 

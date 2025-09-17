@@ -99,6 +99,8 @@ If you want to ensure that specific visits are included and not filtered, specif
    "Plot5" = c(2013, 2016))
 ```
 
+It will give you an output that includes the filtered dataframe as well as a summary of decisions made internally for transparency: number of plots that were auto-trimmed (had greater than specified number of visits), plots included due to manual override, and dropped plots that were trimmed/removed from the dataset. It will print the list of plots that were trimmed so you can review it and decide whether to include them in a re-run with additional manual override. 
+
 Now that the dataframe has been filtered, split it into two items: 
 
 1. a dataframe containing the variable data for each plot visit 
@@ -138,7 +140,7 @@ This will create an output in the console that is synonymous with the Adonis2 co
 
 
 
-### Case Study: Spruce Forest Understory Species Composition in Bark Beetle Disturbed Plots 
+## Case Study: Spruce Forest Understory Species Composition in Bark Beetle Disturbed Plots 
 
 First, input your model and store it as an object. 
 

@@ -1,11 +1,3 @@
-library(readxl)
-library(Matrix)
-library(permute)
-library(lattice)
-library(dplyr)
-library(vegan)
-library(here) 
-
 #'Adjusted PERMANOVA with Custom F-Ratio Permutation Tests
 #'
 #'Performs a PERMANOVA using the \code{adonis2} function from the \code{vegan} package,
@@ -57,8 +49,6 @@ library(here)
 #'@import vegan adonis2
 #'@importFrom permute shuffleSet 
 #'@export
-
-
 
 
 adjusted_permanova <- function(data, 
@@ -158,13 +148,16 @@ adjusted_permanova <- function(data,
 
 
 
+#Test 
 
+library(readxl)
+library(Matrix)
+library(permute)
+library(lattice)
+library(dplyr)
+library(vegan)
+library(here) 
 
-
-
-
-
-Test 
 #Load data 
 beetle_df <- read_xlsx(here("beetle_df_vasc_filtered.xlsx"))
 beetle_env <- read_xlsx(here("beetle_env_vasc_filtered.xlsx"))

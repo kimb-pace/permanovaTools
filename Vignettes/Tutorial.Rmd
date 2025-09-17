@@ -13,10 +13,6 @@ Sections include:
 2. Case study using example data 
  
 
-
-
-
-
 ## Installation 
 
 ```{r install}
@@ -30,11 +26,10 @@ First, input your model and store it as an object.
 ```{r Input Terms}
 
 terms <- list(
-  list(name = "Vs", label = "Viereck", main_subscripts = c("s"), determinant_subscripts = character(0), type = "fixed", levels = "a"),
-  list(name = "Pi", label = "Park", main_subscripts = c("i"), determinant_subscripts = character(0), type = "fixed", levels = "b"),
-  list(name = "Tk", label = "Time", main_subscripts = c("k"), determinant_subscripts = character(0), type = "random", levels = "c"),
-  list(name = "Rj(si)", label = "Plot", main_subscripts = c("j"), determinant_subscripts = c("s", "i"), type = "random", levels = "d"),
-  list(name = "Esik", label = "Error", main_subscripts = c("s", "i", "k"), determinant_subscripts = character(0), type = "random", levels = "abc"))
+  list(name = "Term1", label = "Term1Name", main_subscripts = c("Term1Subscript"), determinant_subscripts = character(0), type = "FixedorRandom", levels = "Term1Levels"),
+  list(name = "Term2", label = "Term2Name", main_subscripts = c("Term2Subscript"), determinant_subscripts = character(0), type = "FixedorRandom", levels = "Term2Levels"),
+  list(name = "Term3", label = "Term3Name", main_subscripts = c("Term3Subscript"), determinant_subscripts = character(0), type = "FixedorRandom", levels = "Term3Levels"),
+  list(name = "ErrorTerm", label = "Residual", main_subscripts = c("ResidualErrorSubscripts), determinant_subscripts = character(0), type = "FixedorRandom", levels = "ErrorLevels"))
 ```
 
 Next, use this object to build the matrix that will be used to partition the variance for your specified model. 
@@ -51,11 +46,11 @@ Now you have an output that looks something like this, depending on the model in
 s    i    k 
 Fixed or Random     F    F    R 
 Number of Levels    a    b    c 
-Subscript           s    i    k 
-Vs                  0    a    a
-Pi                  a    0    a 
-Tk                  a    a    1 
-Esik                a    b    c 
+Subscript           x    x    x 
+Term1               0    a    a
+Term2               a    0    a 
+Term3               a    a    1 
+Residual            a    b    c 
 
 Next, you will use this matrix output as well as the terms object in order to partition the variance of your model. 
 
@@ -64,17 +59,7 @@ ems_results <- calculate_ems(output_matrix, terms)
 print(ems_results)
 ```
 
-This will give you an output in the console that contains the partitioned variance associated with each term in your model. It will look something like this: 
-
-Variance Matrix Console Output Example: 
-
-
-
-
-
-
-
-This output can be used as-is, but it might be a little hard to read using the console formatting for mathematical terms. To assist with viewing, you can use the plot_ems() function to convert this output into correct notation. 
+This will give you an output in the console that contains the partitioned variance associated with each term in your model. This output can be used as-is, but it might be a little hard to read using the console formatting for mathematical terms. To assist with viewing, you can use the plot_ems() function to convert this output into mathmatical notation. 
 
 ```{r Plot EMS}
  plot_ems(ems_results, 
@@ -102,7 +87,7 @@ balanced_data <- balance_visits(
    df = veg_df,
    plot_col = "Plot",
    year_col = "Year",
-   balance_col = "Year"
+   balance_col = "Year",
    n_visits = 2,
    manual_selection = manual_years) 
 ```
@@ -112,7 +97,6 @@ If you want to ensure that specific visits are included and not filtered, specif
  manual_years <- list(
    "Plot4" = c(2012, 2015),
    "Plot5" = c(2013, 2016))
-
 ```
 
 Now that the dataframe has been filtered, split it into two items: 
@@ -154,17 +138,12 @@ This will create an output in the console that is synonymous with the Adonis2 co
 
 
 
-
-
-
-
-
-
-
-
 ### Case Study: Spruce Forest Understory Species Composition in Bark Beetle Disturbed Plots 
 
-```{r Beetle Example: Build Model}
+First, input your model and store it as an object. 
+
+```{r Input Terms: Beetle Example}
+
 terms <- list(
   list(name = "Vs", label = "Viereck", main_subscripts = c("s"), determinant_subscripts = character(0), type = "fixed", levels = "a"),
   list(name = "Pi", label = "Park", main_subscripts = c("i"), determinant_subscripts = character(0), type = "fixed", levels = "b"),
@@ -172,117 +151,92 @@ terms <- list(
   list(name = "Rj(si)", label = "Plot", main_subscripts = c("j"), determinant_subscripts = c("s", "i"), type = "random", levels = "d"),
   list(name = "Esik", label = "Error", main_subscripts = c("s", "i", "k"), determinant_subscripts = character(0), type = "random", levels = "abc"))
 
-#and then generate the matrix that will be used to partition the variance for the model 
+```
+
+Next, use this object to build the matrix that will be used to partition the variance for your specified model. 
+
+```{r Build EMS Matrix: Beetle Example}
+
 output_matrix <- derive_matrix(terms)
 
-#generate your EMS partitioning and figure out how to structure your F tests 
-  ems_results <- calculate_ems(output_matrix, terms)
-  print(ems_results)
+```
 
-#generate a nicer output to help you see things better 
-  plot_ems(ems_results) #shows in viewer 
-  plot(ems_results, save_to_file = TRUE, filename = "EMS_Results.png")
+Use this matrix output as well as the terms object in order to partition the variance of your model. 
 
-#Now that you have your model specified and your F tests adjusted (if needed), begin working with your data. 
+```{r Partition Variance: Beetle Example}
 
-#Does it need to be balanced first? If so, use balance_data() function. 
-  
-  #First determine whether or not you want to manually specify any plots to be retained (for project specific reasons). 
+ems_results <- calculate_ems(output_matrix, terms)
+print(ems_results)
 
-#Example call
-#If using manual override, specify it first as an object: 
-#manual_override <- list(
-#  Plot1 = c(Year1, Year2, Year3),
-#  PLot2 = c(Year1, Year2, Year3))
-#then call for filtered DF using manual_override criteria, number of visits you want, and your unbalanced data 
-#filtered_df <- balance_visits(
-#  unbalanced_dataframe,
-#  plot_col = "Name of Plot column in your data",
-#  year_col = "Name of year column in your data",
-#  n_visits = 2(or however many you want),
-#  manual_selection = manual_override)
+```
 
-#If you are using a manual override and specifying specific plot visits: 
-balanced_dataframe <- balance_visits(
-  df = unbalanced_dataframe,
-  plot_col = "Name of Plot column in your data",
-  year_col = "Name of year column in your data",
-  n_visits = 2(or however many you want),
+To assist with viewing, use the plot_ems() function to convert this output into mathmatical notation. 
+
+```{r Plot EMS: Beetle Example}
+
+ plot_ems(ems_results, 
+         title = "Plot Name",
+         cex = 1.2)
+```
+
+Using this output, I have determined that the following terms need an adjusted F equation: 
+1. Viereck Class (Adjust to Viereck/Plot)
+2. Park (Adjust to Park/Plot)
+
+Now I will begin to work with the data. I have an unequal number of visits per plot. Some plots have been visited 3 years, and others have been visited 4 years. I will therefore filter my dataframe to only retain 3 visits per plot. And for two specified plots, I want to manually choose the visits, so I will specify that in the call. 
+
+```{r Balance Data: Beetle Example}
+balanced_data <- balance_visits(
+  df = beetle_data,
+  plot_col = "Plot",
+  year_col = "Sample_Year",
+  n_visits = 3,
   manual_selection = list(
-    "Plot1" = c(Year1, YEar2),
-    "Plot2" = c(Year1, Year2)))
+    "KATM_2009_01_S996" = c(2012, 2013, 2014), 
+    "LACL_2010_01_S995" = c(2014, 2013, 2019)))
+```
 
-#if manual override is not utilized and you are wanting the script to decide: 
-#the only difference is you're specifying that selection is null: 
-balanced_datafrane <- balance_visits(
-  df = unbalanced_dataframe,
-  plot_col = "Name of Plot column in your data",
-  year_col = "Name of year column in your data",
-  n_visits = 2(or however many you want),
-  manual_selection = NULL)
+Now that the dataframe has been filtered, split it into two items: 
 
-#if your data include multiple visits per year, use this structure: 
-balanced_dataframe <- balance_visits(df = unbalanced_dataframe,
-               plot_col = "Name of Plot column in your data",
-               year_col = "Name of year column in your data",
-               visit_col = "name of month column, must be in Month_Year format", #ie 2020_06
-               n_visits = 2,
-               multiple_visits_per_year = TRUE, #specify if each year has multiple visits here 
-               require_all_years = TRUE) #if you're trying to balance the years so every year has the same number of months, use true 
+1. a dataframe containing the variable data for each plot visit 
+2. a matrix containing all of the species data 
 
-#from here, if you have successfully balanced your data, you can move on to running the PERMANOVA. 
+```{r Create Data Objects: Beetle Example}
+species_data <- balanced_data[,c(8:261)]
+species_matrix <- as.matrix(species_data) 
+variable_data <- balanced_data[,c(1:7)]
+```
 
-#if you didn't need to balance your data and it was already balanced, upload your data like so: 
+Next, define permutation structure restrictions with permute(): 
 
-#Load data 
-beetle_df <- read_xlsx(here("beetle_df_vasc_filtered.xlsx"))
+```{r Define Permutation Structures: Beetle Example}
 
-
-
-#if you have 
-beetle_env <- read_xlsx(here("beetle_env_vasc_filtered.xlsx"))
-
-#Format matrix 
-beetle_composition <- beetle_df[,c(8:261)]
-beetle_composition <- as.matrix(beetle_composition) 
-
-#if using balanced dataframe from above, split off the species data from the main data table 
-
-
-
-
-
-
-
-#design options for restricted permutation structure 
 #time is permuted 
-perm_design_beetle_time = how(
-  plots = Plots(strata = beetle_env$Plot, type = c("free")),
+permutation_structure_1 = how(
+  plots = Plots(strata = variable_data$Plot, type = c("free")),
   within = Within(type = "series", mirror = FALSE),
   nperm = 999)
+
 #time is not permuted
-perm_design_beetle = how(
-  plots = Plots(strata = beetle_env$Plot, type = c("free")),
+permutation_structure_2 = how(
+  plots = Plots(strata = variable_data$Plot, type = c("free")),
   within = Within(type = "none"),
   nperm = 999)
+```
 
-#testing the call using multiple corrected F equations that use the same permutation restrictions 
-multiple_term_result <- adjusted_permanova(
-  data = beetle_env, 
-  matrix = beetle_composition, 
-  base_permutations = perm_design_beetle_time,
+Now that you have everything prepared, use run_permanova() to complete your analysis. 
+
+```{r Run PERMANOVA: Beetle Example}
+permanova_result <- adjusted_permanova(
+  data = variable_data, 
+  matrix = species_matrix, 
+  base_permutations = permutation_structure_1,
   corrected_F_equations = list(
-    "Viereck.3/Plot" = perm_design_beetle,
-    "Park/Plot" = perm_design_beetle),
+    "Viereck.3/Plot" = permutation_structure_2,
+    "Park/Plot" = permutation_structure_2),
   terms = "Viereck.3 + Park + Plot + Sample_Year + Viereck.3*Sample_Year",
   by = "terms",
   method = "bray") 
 ```
-
-
-
-
-
-
 
 

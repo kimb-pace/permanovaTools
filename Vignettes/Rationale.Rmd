@@ -1,14 +1,21 @@
 ## Rationale 
 
 -why method exists 
--walks through the by-hand processes I did for the internship that I turned into functions. maybe include the by hand code for the permanova stuff? explaining how we pulled hte sums of squares for each permutation and looped through to recalculate? or maybe not idk yet 
+-walks through the by-hand processes I did for the internship that I turned into functions. maybe include the by hand code for the permanova stuff? 
+    explaining how we pulled hte sums of squares for each permutation and looped through to recalculate? or maybe not idk yet 
 -set up the problem that the package solves ie makes it easier to adjust F tests 
 -also include why adjusted F tests and variance partitioning are needed 
 -link anderson papers here
 
-F statistics compare the variation explained by a specified term against the estimate of background variation: $F = MS_{Factor}/MS_{Denominator}$. The goal is for the denominator to contain exactly the same variance components as the numerator, with the exeption of the term that is being tested. 
+F statistics compare the variation explained by a specified term against the estimate of background variation: 
+$F = MS_{Factor}/MS_{Denominator}$. The goal is for the denominator to contain exactly the same variance components as the numerator, 
+with the exeption of the term that is being tested. 
 
-In simple models, the F test usually works out to the standard $MS_{Factor}/MS_{Residual}$. For fixed effects, the numerator contains fixed effect and residual variance, so to isolate the contributions of the fixed effect, dividing by the residual error is the most accurate test. For random, nested, and interaction factors, the variance partitioning becomes a little more complex and the denominator needs to be adjusted to cancel out the effect of interest in the numerator. If $MS_{Factor}/MS_{Residual}$ is used to assess significance for a chosen term when it is not ____, you could be left with additional variance not cancelled out in the numerator. This could lead to an inflated F statistic.
+In simple models, the F test usually works out to the standard $MS_{Factor}/MS_{Residual}$. 
+For fixed effects, the numerator contains fixed effect and residual variance, so to isolate the contributions of the fixed effect, dividing by the residual error is the most accurate test. 
+For random, nested, and interaction factors, the variance partitioning becomes a little more complex and the denominator needs to be adjusted to cancel out the effect of interest in the numerator. 
+If $MS_{Factor}/MS_{Residual}$ is used to assess significance for a chosen term when it is not ____, you could be left with additional variance not cancelled out in the numerator. 
+This could lead to an inflated F statistic.
 
 An easy example could be: 
 
@@ -21,9 +28,15 @@ $A_i$ = Factor A (Park) with $i$ Levels
 $B_{(i)j}$ = Factor B (Plot) 
 $\varepsilon_{ij}$ = Residual Variation 
 
-Assume the most accurate F test for testing the effects of Factor $A_i$ in the above example model is $F = MS_{FactorA}/MS_{FactorB}$ because both the numerator and denominator share variance from Factor B (which is a nested effect). But instead of selecting $MS_{FactorB}$ for the denominator, which contains both variation from Factor B and residiual variation, you select $MS_{Residial}$, which only contains residual variation and none from factor B. Now, the equation looks like this: $F_{Inaccurate} = MS_{FactorA}/MS_{Residual}$, and when you attempt to isolate the effects of Factor A, you are left with additional variation from factor B still present. This will lead to an inflated F value, which in turn could cause smaller P values to be inaccurately observed in your analysis. The null distribution would be shifted and it wolud increase the likelihood of false significance being concluded for factors when the variation could be explained by other sources (ie a nested or random effect that wasn't cancelled out in the calculations). 
+Assume the most accurate F test for testing the effects of Factor $A_i$ in the above example model is $F = MS_{FactorA}/MS_{FactorB}$ because both the numerator and denominator 
+share variance from Factor B (which is a nested effect). But instead of selecting $MS_{FactorB}$ for the denominator, which contains both variation from Factor B and residiual 
+variation, you select $MS_{Residial}$, which only contains residual variation and none from factor B. Now, the equation looks like this: $F_{Inaccurate} = MS_{FactorA}/MS_{Residual}$, 
+and when you attempt to isolate the effects of Factor A, you are left with additional variation from factor B still present. This will lead to an inflated F value, which in turn could 
+cause smaller P values to be inaccurately observed in your analysis. The null distribution would be shifted and it wolud increase the likelihood of false significance being concluded 
+for factors when the variation could be explained by other sources (ie a nested or random effect that wasn't cancelled out in the calculations). 
 
-Adjusting the F equations helps reduce Type 1 error problems and leads to higher confidence in the effects of the factor of interest. It helps you avoid concluding that the treatment of interest is driving the differences in species composition (for example) when really it was plot level differences or site variation (or possibly beta dispersion?)
+Adjusting the F equations helps reduce Type 1 error problems and leads to higher confidence in the effects of the factor of interest. It helps you avoid concluding that the treatment 
+of interest is driving the differences in species composition (for example) when really it was plot level differences or site variation (or possibly beta dispersion?)
 
 
 The following workflow is an example of a full variance partitioning workflow for a nested model containing four terms, two fixed and two random, with one interaction. 
@@ -71,7 +84,8 @@ Residual Error $\varepsilon_{sijk}$ & $1$ & $1$ & $1$ & $1$ \\
 \caption{Input matrix for partitioning EMS}
 \end{table}
 
-To partition the variance, cover the column of the factor you're working on (go row by row). The product of visible numbers for each column with at least the subscripts from that row is the variance. 
+To partition the variance, cover the column of the factor you're working on (go row by row). The product of visible numbers for each column with at 
+least the subscripts from that row is the variance. 
 
 Therefore, for this model, the variance is partitioned like so: 
 
@@ -127,16 +141,22 @@ Therefore, using the above F equations, we would choose to adjust our F equation
 To test the effects of Viereck Class and Park, we will use run_permanova to adjust our F equations to term/plot instead of the default of term/residual for the most accurate test. 
 
 
-Varpart() in Vegan partitions raw data variance using Euclidian distances, which is useful in multivariate methods such as RDA and CCA, but for PERMANOVA, which typically uses distances such as Bray-Curtis and Jaccard (not Euclidian), these dissimilarities don't translate. 
+Varpart() in Vegan partitions raw data variance using Euclidian distances, which is useful in multivariate methods such as RDA and CCA, but for PERMANOVA, 
+which typically uses distances such as Bray-Curtis and Jaccard (not Euclidian), these dissimilarities don't translate. 
 
 
 
 
 ****OK this is going to be rough but I am going to make a paraphrased draft of the methods section of the manuscript so its not just copy paste, and then I'll edit it from there:****
 
-The way that this function works is that instead of altering the base mechanics of \adonis2, it uses loops to run through x amount of iterations of the model (x = n permutations, set according to the model chosen). A permutation object is created that stores x amount of versions of your permuted data. A results object is created to store the sums of squares for each of the x amount of permutations for every term in the model. 
+The way that this function works is that instead of altering the base mechanics of \adonis2, it uses loops to run through x amount of iterations of the model (x = n 
+permutations, set according to the model chosen). A permutation object is created that stores x amount of versions of your permuted data. A results object is created to 
+store the sums of squares for each of the x amount of permutations for every term in the model. 
 
-Then, a loop is used to run a single iteration of the PERMANOVA model with zero permutations for every single line in the permutation object. The sums of squares from each run are saved in the results object. The actual data are preserved on the first line and the remaining lines are shuffled versions of that data (within the constraints of how you outline your permutations). From there, columns are created to calculate the F values for each permutation and the original data. And using that F distribution, the adjusted P value is calculated using the following equation: 
+Then, a loop is used to run a single iteration of the PERMANOVA model with zero permutations for every single line in the permutation object. 
+The sums of squares from each run are saved in the results object. The actual data are preserved on the first line and the remaining lines are shuffled 
+versions of that data (within the constraints of how you outline your permutations). From there, columns are created to calculate the F values for each 
+permutation and the original data. And using that F distribution, the adjusted P value is calculated using the following equation: 
 
 $$ P = \frac{\sum_{i=1}^{N} \mathbf(F_i^\text{perm} > F^\text{obs})}{N} $$
 Where N = Total number of permutations 
@@ -153,13 +173,31 @@ Where N = Total number of permutations
 
 Balancing rationale 
 
-Correctly structuring the F tests is only part of ensuring accurate results when using PERMANOVA. Another key space to ensure accuracy is in the data structure itself by balancing strata. To create the null distribution that data is compared against, these data are shuffled (permuted) to erase the effects of interest so that it can be tested against what would happen randomly/by chance. This is where restricting permutations comes into play, allowing you to select how your data are permuted. we are assuming that the permutations are respecting the structure of our experiment so that the null distribution is something that could happen by chance. 
+Correctly structuring the F tests is only part of ensuring accurate results when using PERMANOVA. Another key space to ensure accuracy is in the data structure itself by balancing strata. 
+To create the null distribution that data is compared against, these data are shuffled (permuted) to erase the effects of interest so that it can be tested against what would happen 
+randomly/by chance. This is where restricting permutations comes into play, allowing you to select how your data are permuted. we are assuming that the permutations are respecting the 
+structure of our experiment so that the null distribution is something that could happen by chance. 
 
-If the experimental structure is imbalanced, one part of the design (ie a plot with more visits) would contribute more to the distribution than the other and the variance partitioning wolud be biased towards it. The pseudo-F test may reflect these differences in structure rather than teh effect being tested. Because the sums of squares in PERMANOVA are based on squared distances between centroids, the centroid of a group with ten visits would be estimated more precisely than a group with only two visits. If each group contributes the same number of visits, then every plot has equal weight in the generation of the null distribution and it makes hte conclusions you can draw from the tests are more accurate. Using a balanced distribution, your denominator variance represents an accurate expectation. Using an imbalanced distribution may lead to underestimated variance among certain factors which would lead to an inflated F statistic. This would in turn lead to overconfidence in the term effects, leading to Type 1 error. It would also lead to the inability to accurately separate the effect of the tested variable from the effect of sampling bias. 
+If the experimental structure is imbalanced, one part of the design (ie a plot with more visits) would contribute more to the distribution than the other and the variance partitioning 
+wolud be biased towards it. The pseudo-F test may reflect these differences in structure rather than teh effect being tested. Because the sums of squares in PERMANOVA are based on 
+squared distances between centroids, the centroid of a group with ten visits would be estimated more precisely than a group with only two visits. If each group contributes the same 
+number of visits, then every plot has equal weight in the generation of the null distribution and it makes hte conclusions you can draw from the tests are more accurate. Using a 
+balanced distribution, your denominator variance represents an accurate expectation. Using an imbalanced distribution may lead to underestimated variance among certain factors which 
+would lead to an inflated F statistic. This would in turn lead to overconfidence in the term effects, leading to Type 1 error. It would also lead to the inability to accurately 
+separate the effect of the tested variable from the effect of sampling bias. 
 
-Generally, sample designs are balanced in their design and if all goes to plan, they do not require additional filtering to be properly analyzed. This process comes into play when external, uncontrolled factors disrupt sampling and cause data to not be collected or to have to be thrown out. These factors include plots being inaccessible, travel constraints, unexpected disturbances such as fire, floods, or snowstorms, loss of funding for data collection and hiring, lost data, sampling error leading to rejection of data collected, etc. In these instances, where you set out to collect 5 revisits of each plot but now you have one plot with only 4 revisits, you can make a choice to reject that plot from the design altogether or remove one visit from your other plots so every plot has four visits. 
+Generally, sample designs are balanced in their design and if all goes to plan, they do not require additional filtering to be properly analyzed. This process comes into play when external,
+uncontrolled factors disrupt sampling and cause data to not be collected or to have to be thrown out. These factors include plots being inaccessible, travel constraints, unexpected disturbances 
+such as fire, floods, or snowstorms, loss of funding for data collection and hiring, lost data, sampling error leading to rejection of data collected, etc. In these instances, where you set out 
+to collect 5 revisits of each plot but now you have one plot with only 4 revisits, you can make a choice to reject that plot from the design altogether or remove one visit from your other plots 
+so every plot has four visits. 
 
-In principle, sampling designs are constructed to be balanced, so under ideal conditions no additional filtering is needed for analysis. In practice, however, unforseen factors can disrupt data collection and lead to missing or unusable samples. These disruptions include (but are not limited to) inaccessible plots, travel constraints, disturbances such as fire or flooding, loss of project funding, or data loss. In these instances where you unexpectedly find yourself with unbalanced observations, the choice is to either exclude the incomplete unit (ie plot with less revisits than the rest of the plots) from the design or reduce the other units to match the incomplete one. This action would restore balance to the design and allow for accurate and unbiased analysis despite the disruption. This can be done by hand but for large datasets common in species composition surveys it can be tedious and time consuming to manually filter and remove data, so using a function that allows for a combination of auto-selection and manual selection of data can save time while still preserving control over experimental structure. 
+In principle, sampling designs are constructed to be balanced, so under ideal conditions no additional filtering is needed for analysis. In practice, however, unforseen factors can disrupt 
+data collection and lead to missing or unusable samples. These disruptions include (but are not limited to) inaccessible plots, travel constraints, disturbances such as fire or flooding, 
+loss of project funding, or data loss. In these instances where you unexpectedly find yourself with unbalanced observations, the choice is to either exclude the incomplete unit (ie plot with 
+less revisits than the rest of the plots) from the design or reduce the other units to match the incomplete one. This action would restore balance to the design and allow for accurate and 
+unbiased analysis despite the disruption. This can be done by hand but for large datasets common in species composition surveys it can be tedious and time consuming to manually filter and 
+remove data, so using a function that allows for a combination of auto-selection and manual selection of data can save time while still preserving control over experimental structure. 
 
 For example, using the balance_data example, 
 

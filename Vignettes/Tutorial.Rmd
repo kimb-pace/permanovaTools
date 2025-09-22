@@ -36,7 +36,10 @@ Next, use this object to build the matrix that will be used to partition the var
 
 ```{r Build EMS Matrix}
 
-#****** NOTE: possibly will combine this function with the calculate ems function so it's 100% internal but in the build process it was just easier to split them up. I also did it this way so that the object output was easy to use for plot_ems but again I could probably build it in to have the variance object as an output... i don't know yet. mike if you're reading this as a potential future user of this package let me know what you think
+#****** NOTE: possibly will combine this function with the calculate ems function so it's 100% internal but in the build process it 
+#*was just easier to split them up. I also did it this way so that the object output was easy to use for plot_ems but again I could 
+#*probably build it in to have the variance object as an output... i don't know yet. mike if you're reading this as a potential 
+#*future user of this package let me know what you think
 
 output_matrix <- derive_matrix(terms)
 ```
@@ -59,7 +62,9 @@ ems_results <- calculate_ems(output_matrix, terms)
 print(ems_results)
 ```
 
-This will give you an output in the console that contains the partitioned variance associated with each term in your model. This output can be used as-is, but it might be a little hard to read using the console formatting for mathematical terms. To assist with viewing, you can use the plot_ems() function to convert this output into mathmatical notation. 
+This will give you an output in the console that contains the partitioned variance associated with each term in your model. 
+This output can be used as-is, but it might be a little hard to read using the console formatting for mathematical terms. 
+To assist with viewing, you can use the plot_ems() function to convert this output into mathmatical notation. 
 
 ```{r Plot EMS}
  plot_ems(ems_results, 
@@ -67,7 +72,9 @@ This will give you an output in the console that contains the partitioned varian
          cex = 1.2)
 ```
 
-Using this output or the raw console output from ems_results, you can then determine whether or not you will need to adjust any of your F equations. If you determine that you will not need to adjust any F equations for your specified model, use adonis2 as standard. If you determine that one or more of your F equations will need their denominator adjusted, use run_permanova() to manually adjust your PERMANOVA. 
+Using this output or the raw console output from ems_results, you can then determine whether or not you will need to adjust any of your F equations. 
+If you determine that you will not need to adjust any F equations for your specified model, use adonis2 as standard. 
+If you determine that one or more of your F equations will need their denominator adjusted, use run_permanova() to manually adjust your PERMANOVA. 
 
 Before running adjust_permanova(), however, ensure that your data are in the correct format for this function to operate. 
 
@@ -80,7 +87,8 @@ Load your data and first ensure that it is structured such that there are the fo
 
 Note: Each plot visit needs to be its own row. Create a column that is a combination of plot and time to create a unique visit identifier. 
 
-If the data are already balanced and no exclusions need to be done, then balance_data() does not need to be used. However, if there are unequal numbers of plot visits or unbalanced sampling that needs to be filtered, then use balance_data() to filter your dataframe. 
+If the data are already balanced and no exclusions need to be done, then balance_data() does not need to be used. 
+However, if there are unequal numbers of plot visits or unbalanced sampling that needs to be filtered, then use balance_data() to filter your dataframe. 
 
 ```{r Balance Data}
 balanced_data <- balance_visits(
@@ -99,7 +107,10 @@ If you want to ensure that specific visits are included and not filtered, specif
    "Plot5" = c(2013, 2016))
 ```
 
-It will give you an output that includes the filtered dataframe as well as a summary of decisions made internally for transparency: number of plots that were auto-trimmed (had greater than specified number of visits), plots included due to manual override, and dropped plots that were trimmed/removed from the dataset. It will print the list of plots that were trimmed so you can review it and decide whether to include them in a re-run with additional manual override. 
+It will give you an output that includes the filtered dataframe as well as a summary of decisions made internally for transparency: 
+number of plots that were auto-trimmed (had greater than specified number of visits), plots included due to manual override, 
+and dropped plots that were trimmed/removed from the dataset. It will print the list of plots that were trimmed so you can review 
+it and decide whether to include them in a re-run with additional manual override. 
 
 Now that the dataframe has been filtered, split it into two items: 
 
@@ -185,7 +196,8 @@ Using this output, I have determined that the following terms need an adjusted F
 1. Viereck Class (Adjust to Viereck/Plot)
 2. Park (Adjust to Park/Plot)
 
-Now I will begin to work with the data. I have an unequal number of visits per plot. Some plots have been visited 3 years, and others have been visited 4 years. I will therefore filter my dataframe to only retain 3 visits per plot. And for two specified plots, I want to manually choose the visits, so I will specify that in the call. 
+Now I will begin to work with the data. I have an unequal number of visits per plot. Some plots have been visited 3 years, and others have been visited 4 years. 
+I will therefore filter my dataframe to only retain 3 visits per plot. And for two specified plots, I want to manually choose the visits, so I will specify that in the call. 
 
 ```{r Balance Data: Beetle Example}
 balanced_data <- balance_visits(

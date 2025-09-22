@@ -1,4 +1,4 @@
-## Rationale 
+Rationale 
 
 -why method exists 
 -walks through the by-hand processes I did for the internship that I turned into functions. maybe include the by hand code for the permanova stuff? 
@@ -185,12 +185,6 @@ number of visits, then every plot has equal weight in the generation of the null
 balanced distribution, your denominator variance represents an accurate expectation. Using an imbalanced distribution may lead to underestimated variance among certain factors which 
 would lead to an inflated F statistic. This would in turn lead to overconfidence in the term effects, leading to Type 1 error. It would also lead to the inability to accurately 
 separate the effect of the tested variable from the effect of sampling bias. 
-
-Generally, sample designs are balanced in their design and if all goes to plan, they do not require additional filtering to be properly analyzed. This process comes into play when external,
-uncontrolled factors disrupt sampling and cause data to not be collected or to have to be thrown out. These factors include plots being inaccessible, travel constraints, unexpected disturbances 
-such as fire, floods, or snowstorms, loss of funding for data collection and hiring, lost data, sampling error leading to rejection of data collected, etc. In these instances, where you set out 
-to collect 5 revisits of each plot but now you have one plot with only 4 revisits, you can make a choice to reject that plot from the design altogether or remove one visit from your other plots 
-so every plot has four visits. 
 
 In principle, sampling designs are constructed to be balanced, so under ideal conditions no additional filtering is needed for analysis. In practice, however, unforseen factors can disrupt 
 data collection and lead to missing or unusable samples. These disruptions include (but are not limited to) inaccessible plots, travel constraints, disturbances such as fire or flooding, 

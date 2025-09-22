@@ -53,7 +53,7 @@ Subscript           x    x    x
 Term1               0    a    a
 Term2               a    0    a 
 Term3               a    a    1 
-Residual            a    b    c 
+Residual            0    0    0 
 
 Next, you will use this matrix output as well as the terms object in order to partition the variance of your model. 
 
